@@ -1,0 +1,22 @@
+{
+  "name": "sockless",
+  "version": "0.0.6",
+  "description": "Serverless websocket library for javascript and node.js",
+  "main": "sockless.js",
+  "repository": "git@github.com:rlgod/sockless.git",
+  "author": "Daniel Parker <dparker.tech@gmail.com>",
+  "license": "Apache v2.0",
+  "scripts": {
+    "test": "jest --coverage"
+  },
+  "dependencies": {
+    "firebase": "^4.1.3"
+  },
+  "devDependencies": {
+    "bluebird": "^3.5.0",
+    "gulp": "^3.9.1",
+    "jest": "^20.0.4",
+    "jsonpath": "^0.2.11",
+    "shortid": "^2.2.8"
+  }
+}
