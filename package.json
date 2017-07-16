@@ -22,5 +22,11 @@
     "jsonpath": "^0.2.11",
     "shortid": "^2.2.8",
     "webpack": "^3.3.0"
+  },
+  "jest": {
+    "coveragePathIgnorePatterns": [
+      "<rootDir>/node_modules/",
+      "<rootDir>/libs/"
+    ]
   }
 }

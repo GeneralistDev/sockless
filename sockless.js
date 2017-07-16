@@ -68,7 +68,7 @@ module.exports = function (firebaseDatabaseObject, firebaseSocklessPath) {
         }
 
         fb.ref(fbSockPath).child(topicId).push({
-            timestamp: firebase.ServerValue.TIMESTAMP,
+            timestamp: firebase.database.ServerValue.TIMESTAMP,
             message: message,
         });
     };
