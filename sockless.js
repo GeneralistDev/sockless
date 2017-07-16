@@ -17,13 +17,13 @@ module.exports = function (firebaseDatabaseObject, firebaseSocklessPath) {
             throw new Error('callback cannot be null or undefined');
         }
 
-        let callback = (ds) => {
+        let callback = function (ds) {
             let val = ds.val();
             userCallback(val);
         };
 
         if (options && options.once === true) {
-            callback = (ds) => {
+            callback = function (ds) {
                 unsubscribeTopic(topicId, callback);
                 let val = ds.val();
                 userCallback(val);
@@ -48,7 +48,7 @@ module.exports = function (firebaseDatabaseObject, firebaseSocklessPath) {
             throw new Error('topicId cannot be null or undefined');
         }
 
-        if (subscribeTopic[topicId] && subscribedTopics[topicId].count > 0) {
+        if (subscribedTopics[topicId] && subscribedTopics[topicId].count > 0) {
             subscribedTopics[topicId].ref.off('child_added', callback);
             subscribedTopics[topicId].count--;
         }
@@ -74,7 +74,7 @@ module.exports = function (firebaseDatabaseObject, firebaseSocklessPath) {
     };
 
     const sockless = {
-        on: subscribeTopic,
+        when: subscribeTopic,
         close: unsubscribeTopic,
         emit: emitMessage,
     };

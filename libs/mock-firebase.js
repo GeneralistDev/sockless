@@ -192,6 +192,30 @@ class MockFirebase {
 
         this.eventCallbacks[this.pathExpression][eventType].push(callback);
     }
+
+    off(eventType, callback) {
+        let removeAllCallbacks = true;
+
+        if (callback) {
+            removeAllCallbacks = false;
+        }
+
+        if (!this.eventCallbacks[this.pathExpression]) {
+            throw new Error('No callbacks registered for path', this.pathExpression);
+        }
+
+        if (!this.eventCallbacks[this.pathExpression][eventType]) {
+            throw new Error('No callbacks registered for event type', eventType, 'at path', this.pathExpression);
+        }
+
+        if (removeAllCallbacks) {
+            delete this.eventCallbacks[this.pathExpression][eventType];
+        } else {
+            this.eventCallbacks[this.pathExpression][eventType] = this.eventCallbacks[this.pathExpression][eventType].filter(function(element) {
+                return callback !== element;
+            });
+        }
+    }
 }
 
 module.exports = MockFirebase;
