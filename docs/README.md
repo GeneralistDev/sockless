@@ -1,37 +1,61 @@
-## Welcome to GitHub Pages
+## What is sockless
 
-You can use the [editor on GitHub](https://github.com/rlgod/sockless/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
+Sockless is a serverless websockets library for use with FaaS (Function as a Service) services such as AWS Lambda. 
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+### The problem
+Often serverless architectures result in loss of request context, for example when using DynamoDB streams as part of a workflow. If you want to know when a workflow has completed then until now there hasn't been a simple way to achieve that.
 
-### Markdown
+### What sockless does
+Sockless uses Google's Firebase data binding functionality to provide a websockets-like replacement for serverless workflows like the one described above. 
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+### Setup
+1. Create a Firebase account and project and follow [this guide](https://firebase.google.com/docs/database/web/start) to learn how to connect to Firebase with javascript.
+2. Install `sockless` from npm and include the minified javascript client in your website.
+    ```
+    npm install sockless --save
+    ```
+3. Include the `sockless` Node.js library in your FaaS function package
 
-```markdown
-Syntax highlighted code block
+### How to use it
+#### Website
+```
+var config = {
+    // Your firebase config
+}
 
-# Header 1
-## Header 2
-### Header 3
+firebase.initializeApp(config);
 
-- Bulleted
-- List
+var database = firebase.database();
 
-1. Numbered
-2. List
+var sl = new sockless(database);
 
-**Bold** and _Italic_ and `Code` text
+var cancellationToken = sl.when('myevent', function(message) {
+    // Do something
+});
 
-[Link](url) and ![Image](src)
+sl.close('myevent', cancellationToken);
 ```
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+#### FaaS function
+The Node.js setup for Firebase is slightly different to web. See [the firebase-admin docs](https://firebase.google.com/docs/admin/setup)
 
-### Jekyll Themes
+AWS Lambda Node 6.10.x example
+```
+const admin = require('firebase-admin');
+const Sockless = require('sockless');
+const serviceAccount = require('./myprivatekey.json');
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/rlgod/sockless/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+const firebase = admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: "https://<DATABASE_NAME>.firebaseio.com"
+});
 
-### Support or Contact
+module.exports.handler = function(event, context, callback) {
+    const database = firebase.database();
+    const sl = new Sockless(database);
 
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+    sl.emit('myevent', {
+        // Your event data
+    });
+};
+```
