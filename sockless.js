@@ -67,7 +67,7 @@ module.exports = function (firebaseDatabaseObject, firebaseSocklessPath) {
             throw new Error('message must not be null or undefined');
         }
 
-        fb.ref(fbSockPath).child(topicId).push({
+        return fb.ref(fbSockPath).child(topicId).push({
             timestamp: firebase.database.ServerValue.TIMESTAMP,
             message: message,
         });
