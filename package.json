@@ -1,6 +1,6 @@
 {
   "name": "sockless",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Serverless websocket library for javascript and node.js",
   "main": "sockless.js",
   "repository": "git@github.com:rlgod/sockless.git",
@@ -8,7 +8,8 @@
   "license": "Apache v2.0",
   "scripts": {
     "test": "jest --coverage",
-    "build-web": "webpack --config webpack.config.js"
+    "build": "webpack --config webpack.config.js",
+    "build-dev": "webpack --config webpack-dev.config.js"
   },
   "dependencies": {
     "firebase": "^4.1.3"

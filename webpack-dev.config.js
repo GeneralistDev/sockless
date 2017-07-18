@@ -6,7 +6,7 @@ module.exports = {
     entry: __dirname + "/src/sockless.js",
     output: {
         path: __dirname,
-        filename: "sockless.min.js",
+        filename: "sockless.js",
         library: "sockless",
         libraryTarget: "umd",
         umdNamedDefine: true
@@ -31,10 +31,5 @@ module.exports = {
         ],
         extensions: [".js"]
     },
-    devtool: "source-map",
-    plugins: [
-        new webpack.optimize.UglifyJsPlugin({
-            compress: { warnings: false }
-        })
-    ]
+    devtool: "source-map"
 }
