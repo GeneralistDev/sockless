@@ -1,6 +1,6 @@
 {
   "name": "sockless",
-  "version": "0.0.9",
+  "version": "0.0.13",
   "description": "Serverless websocket library for javascript and node.js",
   "main": "sockless.js",
   "repository": "git@github.com:rlgod/sockless.git",

@@ -3510,30 +3510,48 @@ module.exports = function (firebaseDatabaseObject, firebaseSocklessPath) {
             throw new Error('callback cannot be null or undefined');
         }
 
-        var _callback = function callback(ds) {
-            var val = ds.val();
-            userCallback(val);
-        };
+        var callback = function () {
+            var hasBeenInitialised = false;
 
-        if (options && options.once === true) {
-            _callback = function callback(ds) {
-                unsubscribeTopic(topicId, _callback);
+            return function (ds) {
+                if (!hasBeenInitialised) {
+                    hasBeenInitialised = true;
+                    return;
+                }
+
                 var val = ds.val();
                 userCallback(val);
             };
+        }();
+
+        if (options && options.once === true) {
+            callback = function () {
+                var hasBeenInitialised = false;
+
+                return function (ds) {
+                    if (!hasBeenInitialised) {
+                        hasBeenInitialised = true;
+                        return;
+                    }
+
+                    unsubscribeTopic(topicId, callback);
+                    var val = ds.val();
+                    userCallback(val);
+                };
+            }();
         }
 
         if (subscribedTopics[topicId]) {
-            subscribedTopics[topicId].ref.on('child_added', _callback);
+            subscribedTopics[topicId].ref.endAt().limitToLast(1).on('child_added', callback);
             subscribedTopics[topicId].count++;
         } else {
             subscribedTopics[topicId] = {};
             subscribedTopics[topicId].ref = fb.ref(fbSockPath).child(topicId);
-            subscribedTopics[topicId].ref.on('child_added', _callback);
+            subscribedTopics[topicId].ref.endAt().limitToLast(1).on('child_added', callback);
             subscribedTopics[topicId].count = 1;
         }
 
-        return _callback;
+        return callback;
     };
 
     var unsubscribeTopic = function unsubscribeTopic(topicId, callback) {

@@ -17,26 +17,44 @@ module.exports = function (firebaseDatabaseObject, firebaseSocklessPath) {
             throw new Error('callback cannot be null or undefined');
         }
 
-        let callback = function (ds) {
-            let val = ds.val();
-            userCallback(val);
-        };
+        let callback = (function() {
+            let hasBeenInitialised = false;
 
-        if (options && options.once === true) {
-            callback = function (ds) {
-                unsubscribeTopic(topicId, callback);
+            return function(ds) {
+                if (!hasBeenInitialised) {
+                    hasBeenInitialised = true;
+                    return;
+                }
+
                 let val = ds.val();
                 userCallback(val);
-            }
+            };
+        })();
+
+        if (options && options.once === true) {
+            callback = (function() {
+                let hasBeenInitialised = false;
+
+                return function(ds) {
+                    if (!hasBeenInitialised) {
+                        hasBeenInitialised = true;
+                        return;
+                    }
+                    
+                    unsubscribeTopic(topicId, callback);
+                    let val = ds.val();
+                    userCallback(val);
+                }
+            })();
         }
 
         if (subscribedTopics[topicId]) {
-            subscribedTopics[topicId].ref.on('child_added', callback);
+            subscribedTopics[topicId].ref.endAt().limitToLast(1).on('child_added', callback);
             subscribedTopics[topicId].count++;
         } else {
             subscribedTopics[topicId] = {};
             subscribedTopics[topicId].ref = fb.ref(fbSockPath).child(topicId);
-            subscribedTopics[topicId].ref.on('child_added', callback);
+            subscribedTopics[topicId].ref.endAt().limitToLast(1).on('child_added', callback);
             subscribedTopics[topicId].count = 1;
         }
 
